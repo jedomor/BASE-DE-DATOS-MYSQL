@@ -122,10 +122,34 @@ INSERT INTO MATRICULADO (ID_ALUM, ID_ASIG, Nota1, Nota2, Nota3) VALUES (9, 3, 6,
 INSERT INTO MATRICULADO (ID_ALUM, ID_ASIG, Nota1, Nota2, Nota3) VALUES (10, 2, 9, 5, 5);
 /*INICIO EJERCICIOS*/
 /*1. Mostrar el nombre de las provincias*/
+SELECT NOMBRE FROM provincia;
 /*2. Mostrar el nombre y apellidos de los alumnos*/
+SELECT NOMBRE, APELLIDOS FROM alumno;
+	/*VARIANTE DE CONCAT*/
+	select CONCAT(NOMBRE,' ', APELLIDOS) AS 'Nombre y Apellidos' FROM alumno;
 /*3. Mostrar el código y el nombre de todas las asignaturas*/
+SELECT ID_ASIG, NOMBRE FROM asignatura;
 /*4. Mostrar el DNI, nombre y apellidos de los profesores, ordenados por DNI ascendentemente*/
+SELECT DNI, NOMBRE, APELLIDOS FROM alumno ORDER BY DNI ASC;
 /*5. Mostrar los datos de los alumnos de mayor a menor edad, de forma que en la columna de la fecha de nacimiento aparezca el encabezado “Fecha_de_nacimiento”*/
+SELECT ID_ALUM, DNI, NOMBRE, APELLIDOS, FECHA_NAC as 'Fecha de nacimiento', NACIDO_EN FROM alumno ORDER BY FECHA_NAC DESC;
+	/*variante compleja con join*/
+	SELECT A.ID_ALUM, A.DNI, 
+	CONCAT(A.NOMBRE,' ', A.APELLIDOS) AS 'Nombre y Apellidos', 
+	A.FECHA_NAC AS 'Fecha de nacimiento', 
+	TRUNCATE(DATEDIFF(CURRENT_DATE, A.FECHA_NAC)/365,0) as 'Edad actual' ,
+	P.Nombre as 'Lugar de nacimiento' 
+	FROM alumno A
+	JOIN provincia P
+	on A.NACIDO_EN = P.ID_PROV
+	;
+	/*variante con subconsulta*/
+	SELECT A.ID_ALUM, A.DNI, 
+	CONCAT(A.NOMBRE,' ', A.APELLIDOS) AS 'Nombre y Apellidos', 
+	A.FECHA_NAC AS 'Fecha de nacimiento', 
+	TRUNCATE(DATEDIFF(CURRENT_DATE, A.FECHA_NAC)/365,0) as 'Edad actual' , (SELECT NOMBRE FROM provincia P WHERE P.ID_PROV=A.NACIDO_EN)
+	FROM alumno A
+	;
 /*6. Mostrar los datos del alumno cuyo DNI es 56846315M.*/
 /*7. Mostra los alumnos nacidos en las provincias cuyos códigos estén comprendidos entre 3 y 7*/
 /*8. Mostrar los profesores nacidos en alguna de estas provincias: 1, 3, 5, 7.*/
