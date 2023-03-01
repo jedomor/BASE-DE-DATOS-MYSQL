@@ -176,14 +176,70 @@ INSERT INTO MOVIMIENTO (cod_cuenta, mes, num_mov_mes, cod_tipo_movimiento, impor
 INSERT INTO MOVIMIENTO (cod_cuenta, mes, num_mov_mes, cod_tipo_movimiento, importe, fecha_hora) VALUES (881234, 3, 2, 'IE', 300, '2007/3/12 14:15:00');
 /*INICIO EJERCICIOS*/
 /*1. Mostrar el saldo medio de todas las cuentas de la entidad bancaria.*/
+select avg(`SALDO`) 
+from cuenta
+;
 /*2. Mostrar la suma de los saldos de todas las cuentas bancarias.*/
+select SUM(`SALDO`) 
+from cuenta
+;
 /*3. Mostrar el saldo mínimo, máximo y medio de todas las cuentas bancarias.*/
+select MAX(`SALDO`), 
+  MIN(`SALDO`), 
+  AVG(`SALDO`) 
+FROM cuenta
+;
 /*4. Mostrar la suma de los saldos y el saldo medio de las cuentas bancarias agrupadas por su código de sucursal.*/
+select MAX(C.`SALDO`), 
+  MIN(C.`SALDO`), 
+  AVG(C.`SALDO`), 
+  S.`COD_SUCURSAL` 
+FROM cuenta C 
+JOIN sucursal S 
+where C.`COD_SUCURSAL`= S.`COD_SUCURSAL` 
+GROUP BY S.`COD_SUCURSAL`
+;
 /*5. Para cada cliente del banco se desea conocer su código, la cantidad total que tiene depositada en la entidad y el número de cuentas abiertas.*/
+SELECT CL.`COD_CLIENTE`, 
+  SUM(CU.`SALDO`), 
+  COUNT(CU.`COD_CUENTA`) as 'Numero de cuentas' 
+FROM cliente CL 
+JOIN cuenta CU 
+WHERE CL.`COD_CLIENTE`= CU.`COD_CLIENTE`
+GROUP BY CL.`COD_CLIENTE`
+;
 /*6. Retocar la consulta anterior para que aparezca el nombre y apellidos de cada cliente en vez de su código de cliente.*/
+SELECT CONCAT(CL.`NOMBRE`,' ',CL.`APELLIDOS`), 
+  SUM(CU.`SALDO`), 
+  count(CU.`COD_CUENTA`) as 'Numero de cuentas' 
+FROM cliente CL 
+JOIN cuenta CU 
+WHERE CL.`COD_CLIENTE`= CU.`COD_CLIENTE`
+GROUP BY CL.`COD_CLIENTE`
+;
 /*7. Para cada sucursal del banco se desea conocer su dirección, el número de cuentas que tiene abiertas y la suma total que hay en ellas.*/
+SELECT SU.`DIRECCION`, 
+  SU.`COD_SUCURSAL`,
+  sum(CU.`COD_CUENTA`), 
+  SUM(CU.`SALDO`)
+from sucursal SU
+JOIN cuenta CU
+WHERE SU.`COD_SUCURSAL`=CU.`COD_SUCURSAL`
+GROUP BY CU.`COD_SUCURSAL`
+;
 /*8. Mostrar el saldo medio y el interés medio de las cuentas a las que se le aplique un interés mayor del 10%, de las sucursales 1 y 2.*/
+SELECT avg(CU.`SALDO`),
+  avg(CU.`INTERES`),
+  SU.`COD_SUCURSAL`
+FROM cuenta CU
+JOIN sucursal SU
+where SU.`COD_SUCURSAL`=CU.`COD_SUCURSAL`
+  AND SU.`COD_SUCURSAL`=1 OR SU.`COD_SUCURSAL`=2
+  and CU.`INTERES`>=0.10
+GROUP BY SU.`COD_SUCURSAL`
+;
 /*9. Mostrar los tipos de movimientos de las cuentas bancarias, sus descripciones y el volumen total de dinero que se manejado en cada tipo de movimiento.*/
+
 /*10. Mostrar cuál es la cantidad media que sacan de cajero los clientes de nuestro banco.*/
 /*11. Calcular la cantidad total de dinero que emite la entidad bancaria clasificada según los tipos de movimientos de salida.*/
 /*12. Calcular la cantidad total de dinero que ingresa cada cuenta bancaria clasificada según los tipos de movimientos de entrada.*/
