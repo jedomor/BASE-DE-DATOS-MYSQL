@@ -1,3 +1,4 @@
+-- Active: 1677490715810@@127.0.0.1@3306
 CREATE DATABASE Boletin_01_Centro_Educativo;
 USE Boletin_01_Centro_Educativo;
 
@@ -123,6 +124,8 @@ INSERT INTO MATRICULADO (ID_ALUM, ID_ASIG, Nota1, Nota2, Nota3) VALUES (10, 2, 9
 /*INICIO EJERCICIOS*/
 /*1. Mostrar el nombre de las provincias*/
 SELECT NOMBRE FROM provincia;
+CREATE VIEW vista_provincias AS SELECT `NOMBRE` FROM boletin_01_centro_educativo.provincia;
+select * FROM boletin_01_centro_educativo.vista_provincias;
 /*2. Mostrar el nombre y apellidos de los alumnos*/
 SELECT NOMBRE, APELLIDOS FROM alumno;
 	/*VARIANTE DE CONCAT*/
@@ -151,15 +154,65 @@ SELECT ID_ALUM, DNI, NOMBRE, APELLIDOS, FECHA_NAC as 'Fecha de nacimiento', NACI
 	FROM alumno A
 	;
 /*6. Mostrar los datos del alumno cuyo DNI es 56846315M.*/
+SELECT * 
+FROM boletin_01_centro_educativo.alumno 
+WHERE `DNI` Like '56846315m'ç
+;
 /*7. Mostra los alumnos nacidos en las provincias cuyos códigos estén comprendidos entre 3 y 7*/
+select NOMBRE, NACIDO_EN 
+FROM boletin_01_centro_educativo.alumno 
+where `NACIDO_EN` BETWEEN 3 and 7;
+	/*Variante para join*/
+	select A.NOMBRE, P.NOMBRE as 'Provincia de nacimiento'
+	FROM boletin_01_centro_educativo.alumno A 
+	JOIN boletin_01_centro_educativo.provincia P 
+	Where A.NACIDO_EN = P.ID_PROV and A.`NACIDO_EN` BETWEEN 3 and 7
+	; 
+	/*Variante para subconsulta*/
+	SELECT nombre, 
+		(SELECT P.`NOMBRE` 
+		from boletin_01_centro_educativo.provincia P 
+		where A.`NACIDO_EN` = P.`ID_PROV` 
+		AND A.`NACIDO_EN` BETWEEN 3 and 7) 
+		AS 'Provincia de nacimiento'
+	FROM boletin_01_centro_educativo.alumno A
+	;
 /*8. Mostrar los profesores nacidos en alguna de estas provincias: 1, 3, 5, 7.*/
+SELECT * FROM boletin_01_centro_educativo.profesor;
+select P.`NOMBRE`, `NACIDO_EN` from boletin_01_centro_educativo.profesor P where `NACIDO_EN` IN(1,3,5,7);
+	/*Consulta realizando join*/
+	select P.`NOMBRE`, PR.`NOMBRE` as 'Provincia'
+	from Profesor P 
+	Join boletin_01_centro_educativo.provincia PR 
+	where PR.`ID_PROV`= P.`NACIDO_EN` 
+	and P.`NACIDO_EN` in(1,3,5,7)
+	;
+	/*Variante Subconsulta*/
+
 /*9. Mostrar los alumnos nacidos entre el 19/02/1980 y el 20/07/1984.*/
+select * from boletin_01_centro_educativo.alumno where `FECHA_NAC` BETWEEN '19/02/1980' and '20/07/1984';
 /*10. Mostrar los registros de la tabla “Matriculado” del alumno 7.*/
+select M.*, CONCAT(A.`NOMBRE`, ' ', A.`APELLIDOS`) as 'Nombre y apellidos' 
+from boletin_01_centro_educativo.matriculado M 
+JOIN boletin_01_centro_educativo.alumno A
+where A.`ID_ALUM` = M.`ID_ALUM`
+and A.`ID_ALUM` = '7'
+;
+	/*Variante Subconsulta*/
+
 /*11. Mostrar el nombre y apellidos de los alumnos mayores de 35 años.*/
+select CONCAT(`NOMBRE`,'', `APELLIDOS`) as 'Nombre y apellidos', truncate(DATEDIFF(CURRENT_DATE,`FECHA_NAC`)/365,0) as 'Edad actual'
+FROM boletin_01_centro_educativo.alumno
+where truncate(DATEDIFF(CURRENT_DATE,`FECHA_NAC`)/365,0) > 35
+; 
 /*12. Mostrar aquellos alumnos cuyo DNI contenga la letra 'Y'.*/
+SELECT A.* FROM boletin_01_centro_educativo.alumno A where A.`DNI` like '%Y%';
 /*13. Mostrar aquellos alumnos cuyo nombre empiece por ‘S’.*/
+SELECT A.* FROM boletin_01_centro_educativo.alumno A where A.`NOMBRE` like 'S%';
 /*14. Mostrar el nombre de aquellos alumnos cuyo nombre contenga la letra ‘n’, ya sea mayúscula o minúscula.*/
+SELECT A.* FROM boletin_01_centro_educativo.alumno A where A.`NOMBRE` like '%n%';
 /*15. Mostrar el nombre de aquellos alumnos cuyo apellido contenga la letra ‘z’, mayúscula o minúscula.*/
+SELECT A.
 /*16. Mostrar aquellos alumnos que tengan por primer nombre “Manuel”.*/
 /*17. Mostrar aquellos alumnos que se llamen “Manuel” o “Cristina”.*/
 /*18. Mostrar los datos de los alumnos cuyo DNI empiece por 2.*/
