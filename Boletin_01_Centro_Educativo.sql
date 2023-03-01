@@ -1,4 +1,4 @@
--- Active: 1677490715810@@127.0.0.1@3306
+-- Active: 1677666159474@@127.0.0.1@3306@boletin_01_centro_educativo
 CREATE DATABASE Boletin_01_Centro_Educativo;
 USE Boletin_01_Centro_Educativo;
 
@@ -206,31 +206,168 @@ FROM boletin_01_centro_educativo.alumno
 where truncate(DATEDIFF(CURRENT_DATE,`FECHA_NAC`)/365,0) > 35
 ; 
 /*12. Mostrar aquellos alumnos cuyo DNI contenga la letra 'Y'.*/
-SELECT A.* FROM boletin_01_centro_educativo.alumno A where A.`DNI` like '%Y%';
+SELECT A.* 
+FROM boletin_01_centro_educativo.alumno A 
+where A.`DNI` like '%Y%'
+;
 /*13. Mostrar aquellos alumnos cuyo nombre empiece por ‘S’.*/
-SELECT A.* FROM boletin_01_centro_educativo.alumno A where A.`NOMBRE` like 'S%';
+SELECT A.* 
+FROM boletin_01_centro_educativo.alumno A 
+where A.`NOMBRE` like 'S%'
+;
 /*14. Mostrar el nombre de aquellos alumnos cuyo nombre contenga la letra ‘n’, ya sea mayúscula o minúscula.*/
-SELECT A.* FROM boletin_01_centro_educativo.alumno A where A.`NOMBRE` like '%n%';
+SELECT A.* 
+FROM boletin_01_centro_educativo.alumno A 
+where A.`NOMBRE` like '%n%'
+;
 /*15. Mostrar el nombre de aquellos alumnos cuyo apellido contenga la letra ‘z’, mayúscula o minúscula.*/
-SELECT A.
+SELECT A.*
+from boletin_01_centro_educativo.alumno A 
+WHERE A.`APELLIDOS` LIKE '%z%'
+;
 /*16. Mostrar aquellos alumnos que tengan por primer nombre “Manuel”.*/
+SELECT A.* 
+FROM alumno A
+;
+select A.* 
+FROM alumno A 
+WHERE A.`NOMBRE` LIKE 'Manuel%'
+;
 /*17. Mostrar aquellos alumnos que se llamen “Manuel” o “Cristina”.*/
+select A.* 
+FROM alumno A 
+WHERE A.`NOMBRE` LIKE 'Manuel' 
+or A.`NOMBRE` like 'Cristina'
+;
 /*18. Mostrar los datos de los alumnos cuyo DNI empiece por 2.*/
+SELECT A.* 
+FROM alumno A 
+WHERE A.`DNI` like '2%'
+;
 /*19. Mostrar los identificadores de provincia en las que han nacido los alumnos, sin que estos identificadores se repitan.*/
+select distinct PROVINCIA.`NOMBRE`, ALUMNO.`NOMBRE` 
+from alumno 
+JOIN provincia
+WHERE ALUMNO.`NACIDO_EN` = PROVINCIA.`ID_PROV`
+;
 /*20. Mostrar la tabla de “Matriculado” y añadir una columna más que sea la media de las tres notas de cada alumno, ordenados de la mejor nota a la peor.*/
+SELECT concat(A.`NOMBRE`,' ',A.`APELLIDOS`) as 'Nombre y Apellidos', M.*, (M.`NOTA1` + M.`NOTA2` + M.`NOTA3`)/3 as Nota_Media 
+FROM matriculado M 
+join alumno A 
+where A.`ID_ALUM`=M.`ID_ALUM` 
+ORDER BY Nota_Media DESC
+;
 /*21. Mostrar los registros de la tabla “Matriculado” en los que un alumno haya superado los 3 exámenes de la asignatura 1.*/
+select A.`NOMBRE`, M.*
+FROM matriculado M
+join alumno A
+where A.`ID_ALUM`= M.`ID_ALUM`
+and M.`NOTA1`>= 5 
+and M.`NOTA2` >= 5 
+and M.`NOTA3` >= 5
+order by `ID_ALUM`
+;
 /*22. Mostrar los registros de la tabla “Matriculado” en los que un alumno haya sacado un 10 en alguna de las 3 notas en cualquier asignatura.*/
+select A.`NOMBRE`, M.*
+FROM matriculado M
+join alumno A
+where A.`ID_ALUM`= M.`ID_ALUM`
+and M.`NOTA1`>= 10 
+or M.`NOTA2` >= 10 
+or M.`NOTA3` >= 10
+order by `ID_ALUM`
+;
 /*23. Mostrar aquellos registros de la tabla “Matriculado” en los que un alumno haya superado alguno de los 3 exámenes de la asignatura 2.*/
-/*24. Mostrar los registros de la tabla “Matriculado” en los que un alumno haya superado el primer examen ordenando los registros por “nota2” y “nota3” de menor a mayor para ambos campos.*/
+select A.`NOMBRE`, M.*
+FROM matriculado M
+join alumno A
+where A.`ID_ALUM`= M.`ID_ALUM`
+and M.`ID_ASIG`=2
+and (M.`NOTA1`>= 5 OR M.`NOTA2` >= 5 OR M.`NOTA3` >= 5)
+ORDER BY M.`ID_ALUM`
+;
+/*24. Mostrar los registros de la tabla “Matriculado” en los que un alumno haya superado el primer examen ordenando los registros por “nota2” y “nota3” 
+de menor a mayor para ambos campos.*/
+select A.`NOMBRE`, M.*
+FROM matriculado M
+join alumno A
+where A.`ID_ALUM`= M.`ID_ALUM`
+and M.`NOTA1`>= 5
+ORDER BY M.`NOTA2` AND M.`NOTA3`
+;
 /*25. Mostrar aquellos alumnos nacidos en el 1985*/
-/*26. Mostrar los datos de los alumnos y además una columna calculada “mes” que represente el mes en el que nació el alumno. Además se debe ordenar por dicha columna.*/
-/*27. Mostrar los datos de los alumnos y además una columna calculada “fecha_de_ nacimiento” que represente el día en el que nació el alumno con el siguiente formato “Nacido el día xx del xx de xxxx”.*/
+SELECT concat(`NOMBRE`,' ',`APELLIDOS`) as 'Nombre y Apellidos', year(`FECHA_NAC`) as 'Año de nacimiento'
+from alumno
+where YEAR(`FECHA_NAC`) = 1985
+;
+/*26. Mostrar los datos de los alumnos y además una columna calculada “mes” que represente el mes en el que nació el alumno. 
+Además se debe ordenar por dicha columna.*/
+SELECT concat(`NOMBRE`,' ',`APELLIDOS`) as 'Nombre y Apellidos', month(`FECHA_NAC`) as 'Mes de nacimiento'
+from alumno
+order by month(`FECHA_NAC`)
+;
+/*27. Mostrar los datos de los alumnos y además una columna calculada “fecha_de_ nacimiento” que represente el día en el que nació el alumno con el siguiente formato 
+“Nacido el día xx del xx de xxxx”.*/
+SET lc_time_names = 'es_ES';
+SELECT concat(`NOMBRE`,' ',`APELLIDOS`) as 'Nombre y Apellidos',
+	concat('Nacido el día ', day(`FECHA_NAC`) , ' del ', MONTH(`FECHA_NAC`), ' de ', year(`FECHA_NAC`)) as 'Fecha de nacimiento'
+from alumno
+;
+	/*CORRECTO*/
+	SELECT concat(`NOMBRE`,' ',`APELLIDOS`) as 'Nombre y Apellidos',
+		DATE_FORMAT(`FECHA_NAC`, 'Nacido el día: ' '%d' ' de ' '%M' ' de ' '%Y') as 'Fecha de nacimiento'
+	from alumno
+	;
 /*28. Mostrar el nombre, apellidos y la edad de los alumnos*/
+SELECT concat(`NOMBRE`,' ',`APELLIDOS`) as 'Nombre y Apellidos', 
+	TRUNCATE(DATEDIFF(CURRENT_DATE,`FECHA_NAC`)/365,0) as Edad
+from alumno
+order by Edad DESC
+;
 /*29. Mostrar los datos de los alumnos y además una columna calculada “dias_vividos” que represente los días que lleva vivido el alumno hasta la fecha de hoy.*/
+SELECT concat(`NOMBRE`,' ',`APELLIDOS`) as 'Nombre y Apellidos', 
+	DATEDIFF(CURRENT_DATE,`FECHA_NAC`) as 'Días vividos'
+from alumno
+;
 /*30. Mostrar el nombre y apellidos de los 4 alumnos con mayor edad.*/
+SELECT concat(`NOMBRE`,' ',`APELLIDOS`) as 'Nombre y Apellidos', 
+	TRUNCATE(DATEDIFF(CURRENT_DATE,`FECHA_NAC`)/365,0) as Edad
+from alumno
+order by Edad DESC
+LIMIT 4
+;
 /*31. Contar el número de alumnos que hay en el centro educativo.*/
+select count(DISTINCT `ID_ALUM`) as 'Alumnos matriculados'
+FROM matriculado
+;
 /*32. Contar el número de profesores nacidos en la provincia 2 (Sevilla) que hay en el centro educativo.*/
+SELECT COUNT(DISTINCT `ID_PROF`)
+from profesor
+WHERE `NACIDO_EN`=2
+;
 /*33. Mostrar la nota2 más alta de todas.*/
+SELECT concat(A.`NOMBRE`,' ',A.`APELLIDOS`) as 'Nombre y Apellidos',
+	M.`NOTA2` as 'Nota 2 más alta'
+FROM alumno A
+JOIN matriculado M
+WHERE A.`ID_ALUM` = M.`ID_ALUM`
+ORDER BY M.`NOTA2` DESC
+LIMIT 1
+;
 /*34. Mostrar la nota1 más baja de la asignatura 1 (Redes)*/
+SELECT concat(A.`NOMBRE`,' ',A.`APELLIDOS`) as 'Nombre y Apellidos',
+	M.`NOTA1` as 'Nota 1 más baja'
+FROM alumno A
+JOIN matriculado M
+WHERE A.`ID_ALUM` = M.`ID_ALUM`
+AND `ID_ASIG`=1
+ORDER BY M.`NOTA1` ASC
+LIMIT 1
+;
 /*35. Mostrar el sumatorio de todas las notas1 de la asignatura 1 (Redes)*/
-/*36. Mostrar la suma de todas las notas1 de la asignatura 1 (Redes) fabricando una columna llamada suma. Además se deben añadir 2 columnas más que se correspondan con el número de notas1 existentes y con el valor de la nota media.*/
+SELECT SUM(`NOTA1`) as 'Sumatorio de notas 1 de la asignatura 1'
+FROM matriculado
+WHERE `ID_ASIG`=1
+;
+/*36. Mostrar la suma de todas las notas1 de la asignatura 1 (Redes) fabricando una columna llamada suma. 
+Además se deben añadir 2 columnas más que se correspondan con el número de notas1 existentes y con el valor de la nota media.*/
